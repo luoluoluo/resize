@@ -85,17 +85,17 @@ func Open(name string) (img image.Image, err error) {
 	file, err := os.Open(name)
 	defer file.Close()
 	switch filetype {
-	case "jpeg", "jpg":
+	case ".jpeg", ".jpg":
 		img, err = jpeg.Decode(file)
 		if err != nil {
 			return nil, err
 		}
-	case "gif":
+	case ".gif":
 		img, err = gif.Decode(file)
 		if err != nil {
 			return nil, err
 		}
-	case "png":
+	case ".png":
 		img, err = png.Decode(file)
 		if err != nil {
 			return nil, err
@@ -112,17 +112,17 @@ func Save(name string, img image.Image) (err error) {
 	file, err := os.Create(name)
 	defer file.Close()
 	switch filetype {
-	case "jpeg", "jpg":
+	case ".jpeg", ".jpg":
 		err = jpeg.Encode(file, img, nil)
 		if err != nil {
 			return err
 		}
-	case "gif":
+	case ".gif":
 		err = gif.Encode(file, img, nil)
 		if err != nil {
 			return err
 		}
-	case "png":
+	case ".png":
 		err = png.Encode(file, img)
 		if err != nil {
 			return err
