@@ -25,7 +25,13 @@ THIS SOFTWARE.
 package resize
 
 import (
+	"errors"
 	"image"
+	"image/gif"
+	"image/jpeg"
+	"image/png"
+	"os"
+	"path/filepath"
 	"runtime"
 	"sync"
 )
@@ -72,6 +78,60 @@ func (i InterpolationFunction) kernel() (int, func(float64) float64) {
 
 // values <1 will sharpen the image
 var blur = 1.0
+
+// Open open img
+func Open(name string) (img image.Image, err error) {
+	var filetype = filepath.Ext(name)
+	file, err := os.Open(name)
+	defer file.Close()
+	switch filetype {
+	case "jpeg", "jpg":
+		img, err = jpeg.Decode(file)
+		if err != nil {
+			return nil, err
+		}
+	case "gif":
+		img, err = gif.Decode(file)
+		if err != nil {
+			return nil, err
+		}
+	case "png":
+		img, err = png.Decode(file)
+		if err != nil {
+			return nil, err
+		}
+	default:
+		return nil, errors.New("type error")
+	}
+	return img, nil
+}
+
+// Save save img
+func Save(name string, img image.Image) (err error) {
+	var filetype = filepath.Ext(name)
+	file, err := os.Create(name)
+	defer file.Close()
+	switch filetype {
+	case "jpeg", "jpg":
+		err = jpeg.Encode(file, img, nil)
+		if err != nil {
+			return err
+		}
+	case "gif":
+		err = gif.Encode(file, img, nil)
+		if err != nil {
+			return err
+		}
+	case "png":
+		err = png.Encode(file, img)
+		if err != nil {
+			return err
+		}
+	default:
+		return errors.New("type error")
+	}
+	return nil
+}
 
 // Resize scales an image to new width and height using the interpolation function interp.
 // A new image with the given dimensions will be returned.
